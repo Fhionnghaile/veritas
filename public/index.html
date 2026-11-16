@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Veritas — verify a skill credential</title>
+<style>
+  :root{--g:#B07D1A;--ink:#14203A;--paper:#F6F4EE;--card:#fff;--good:#116630;--bad:#b3261e;--line:#e3ddcf}
+  @media(prefers-color-scheme:dark){:root{--ink:#ECE8DC;--paper:#0B1322;--card:#121D32;--good:#54c48c;--bad:#ff8a80;--line:#223}}
+  *{box-sizing:border-box} body{margin:0;background:var(--paper);color:var(--ink);font:16px/1.55 ui-sans-serif,system-ui,Segoe UI,Roboto,Arial;padding:24px}
+  .wrap{max-width:760px;margin:0 auto} h1{font-weight:800;letter-spacing:-.02em;margin:.2em 0}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px;margin:16px 0}
+  textarea{width:100%;min-height:110px;font:13px/1.4 ui-monospace,Menlo,Consolas,monospace;padding:10px;border-radius:10px;border:1px solid var(--line);background:transparent;color:inherit;word-break:break-all}
+  button{font:600 15px/1 inherit;padding:10px 16px;border-radius:10px;border:1px solid var(--g);background:var(--g);color:#1a1205;cursor:pointer;margin:6px 6px 0 0}
+  button.ghost{background:transparent;color:var(--ink)}
+  .verdict{font-weight:800;font-size:18px;margin-top:12px} .ok{color:var(--good)} .no{color:var(--bad)}
+  .muted{opacity:.7;font-size:13px} pre{white-space:pre-wrap;word-break:break-all;background:transparent;border:1px dashed var(--line);border-radius:8px;padding:8px;font-size:12px}
+</style></head><body><div class="wrap">
+  <h1>Veritas</h1>
+  <p class="muted">Paste a skill credential and verify it <strong>in your browser</strong> — the signature is checked locally against the issuer's public key. No server, no "the database says so".</p>
+  <div class="card">
+    <textarea id="tok" spellcheck="false"></textarea>
+    <div>
+      <button onclick="doVerify()">Verify</button>
+      <button class="ghost" onclick="loadSample()">Load sample</button>
+      <button class="ghost" onclick="tamper()">Tamper one byte</button>
+    </div>
+    <div id="verdict" class="verdict"></div>
+    <pre id="detail"></pre>
+  </div>
+  <p class="muted">Issuer public key (Ed25519): <code id="pk"></code></p>
+<script src="./vendor/nacl.min.js"></script>
+<script>
+  const PUB="A6EHv_POEL4dcN0Y50vAmWfk1jCbpQ1fHdyGZBJVMbg", SAMPLE="v1.eyJleHAiOjE4MjYyODAwMDAsImlhdCI6MTc5NDY1NzYwMCwiaXNzIjoiZGlkOndlYjpkZXJyeXRyYWluaW5nLmNvbSIsImp0aSI6ImNyZWRfMDFIVjhaNlEiLCJraWQiOiJ2ZXJpdGFzLWVkMjU1MTktMjAyNiIsImxldmVsIjoiQWR2YW5jZWQiLCJza2lsbCI6ImNvbnRhaW5lci1zZWN1cml0eS1zYW5kYm94aW5nIiwic3ViIjoiZGlkOmRlcnJ5OnN0dWRlbnQ6N2YzYSJ9.ox8OGLBS4-4Vrei79BxyLfqa2KLk0YPOKIZtchZoUbJZMvuD3mv8-cRk9g-_bEvVyNseBG1F2AZuttrTyuoABA", VERIFY_AT=1794744000;
+  document.getElementById('pk').textContent=PUB;
+  const b64uDec=s=>{s=s.replace(/-/g,'+').replace(/_/g,'/');while(s.length%4)s+='=';const b=atob(s);const u=new Uint8Array(b.length);for(let i=0;i<b.length;i++)u[i]=b.charCodeAt(i);return u;};
+  const ascii=s=>{const u=new Uint8Array(s.length);for(let i=0;i<s.length;i++)u[i]=s.charCodeAt(i);return u;};
+  function verify(token){
+    const p=token.trim().split('.');
+    if(p.length!==3||p[0]!=='v1')return{valid:false,reason:'bad format'};
+    let ok;try{ok=nacl.sign.detached.verify(ascii('v1.'+p[1]),b64uDec(p[2]),b64uDec(PUB));}catch(e){return{valid:false,reason:'malformed'};}
+    if(!ok)return{valid:false,reason:'signature invalid — tampered or wrong issuer'};
+    let payload;try{payload=JSON.parse(new TextDecoder().decode(b64uDec(p[1])));}catch(e){return{valid:false,reason:'malformed payload'};}
+    if(payload.exp && payload.exp<VERIFY_AT)return{valid:false,reason:'expired',payload};
+    return{valid:true,reason:'ok',payload};
+  }
+  function doVerify(){
+    const r=verify(document.getElementById('tok').value);
+    const v=document.getElementById('verdict');
+    v.textContent=r.valid?'✓ VALID — signature checks out':'✗ INVALID — '+r.reason;
+    v.className='verdict '+(r.valid?'ok':'no');
+    document.getElementById('detail').textContent=r.payload?JSON.stringify(r.payload,null,2):'';
+  }
+  function loadSample(){document.getElementById('tok').value=SAMPLE;doVerify();}
+  function tamper(){let t=document.getElementById('tok').value||SAMPLE;const p=t.split('.');if(p.length===3){const i=10%p[1].length;p[1]=p[1].slice(0,i)+(p[1][i]==='A'?'B':'A')+p[1].slice(i+1);}document.getElementById('tok').value=p.join('.');doVerify();}
+  loadSample();
+</script>
+</div></body></html>

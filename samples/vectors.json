@@ -1,0 +1,35 @@
+{
+  "scheme": "Ed25519",
+  "token_format": "v1.<base64url(payload_json)>.<base64url(sig)>  ; signing_input = ASCII(\"v1.\"+payload_b64)",
+  "issuer_public_key_b64url": "A6EHv_POEL4dcN0Y50vAmWfk1jCbpQ1fHdyGZBJVMbg",
+  "issuer_public_key_hex": "03a107bff3ce10be1d70dd18e74bc09967e4d6309ba50d5f1ddc8664125531b8",
+  "TEST_ONLY_private_seed_b64url": "AAECAwQFBgcICQoLDA0ODxAREhMUFRYXGBkaGxwdHh8",
+  "verify_at_unix": 1794744000,
+  "note": "TEST VECTORS ONLY. The private seed is published so anyone can regenerate these. NEVER use this key in production.",
+  "vectors": [
+    {
+      "name": "valid",
+      "token": "v1.eyJleHAiOjE4MjYyODAwMDAsImlhdCI6MTc5NDY1NzYwMCwiaXNzIjoiZGlkOndlYjpkZXJyeXRyYWluaW5nLmNvbSIsImp0aSI6ImNyZWRfMDFIVjhaNlEiLCJraWQiOiJ2ZXJpdGFzLWVkMjU1MTktMjAyNiIsImxldmVsIjoiQWR2YW5jZWQiLCJza2lsbCI6ImNvbnRhaW5lci1zZWN1cml0eS1zYW5kYm94aW5nIiwic3ViIjoiZGlkOmRlcnJ5OnN0dWRlbnQ6N2YzYSJ9.ox8OGLBS4-4Vrei79BxyLfqa2KLk0YPOKIZtchZoUbJZMvuD3mv8-cRk9g-_bEvVyNseBG1F2AZuttrTyuoABA",
+      "expect": {
+        "valid": true,
+        "reason": "signature ok and not expired"
+      }
+    },
+    {
+      "name": "tampered",
+      "token": "v1.eyJleHAiOjE4MjcyODAwMDAsImlhdCI6MTc5NDY1NzYwMCwiaXNzIjoiZGlkOndlYjpkZXJyeXRyYWluaW5nLmNvbSIsImp0aSI6ImNyZWRfMDFIVjhaNlEiLCJraWQiOiJ2ZXJpdGFzLWVkMjU1MTktMjAyNiIsImxldmVsIjoiQWR2YW5jZWQiLCJza2lsbCI6ImNvbnRhaW5lci1zZWN1cml0eS1zYW5kYm94aW5nIiwic3ViIjoiZGlkOmRlcnJ5OnN0dWRlbnQ6N2YzYSJ9.ox8OGLBS4-4Vrei79BxyLfqa2KLk0YPOKIZtchZoUbJZMvuD3mv8-cRk9g-_bEvVyNseBG1F2AZuttrTyuoABA",
+      "expect": {
+        "valid": false,
+        "reason": "signature verification fails (payload byte flipped)"
+      }
+    },
+    {
+      "name": "expired",
+      "token": "v1.eyJleHAiOjE3OTQ2NTc2MDAsImlhdCI6MTc5NDY1NzYwMCwiaXNzIjoiZGlkOndlYjpkZXJyeXRyYWluaW5nLmNvbSIsImp0aSI6ImNyZWRfMDFIVjhaNlEiLCJraWQiOiJ2ZXJpdGFzLWVkMjU1MTktMjAyNiIsImxldmVsIjoiQWR2YW5jZWQiLCJza2lsbCI6ImNvbnRhaW5lci1zZWN1cml0eS1zYW5kYm94aW5nIiwic3ViIjoiZGlkOmRlcnJ5OnN0dWRlbnQ6N2YzYSJ9.j_xQ5xF8lDzehqF8awASpVQbqauDtqm1Df6Zw-A6T2a9MxX8gjx-tAFezZyWn4VlGe--atBLFpHCG5bgbxg2Ag",
+      "expect": {
+        "valid": false,
+        "reason": "signature ok but exp < verify_at"
+      }
+    }
+  ]
+}

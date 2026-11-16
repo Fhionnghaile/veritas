@@ -1,0 +1,11 @@
+{
+  "name": "pf/veritas",
+  "description": "Veritas — verifiable skill credentials (Ed25519). Issue, verify, scope, revoke.",
+  "type": "library",
+  "license": "MIT",
+  "require": { "php": ">=8.1", "ext-sodium": "*" },
+  "require-dev": { "phpunit/phpunit": "^10" },
+  "autoload": { "psr-4": { "Veritas\\": "src/" } },
+  "autoload-dev": { "psr-4": { "Veritas\\Tests\\": "tests/" } },
+  "scripts": { "test": "phpunit", "lint": "php -l src/Credential.php && php -l src/Issuer.php && php -l src/Verifier.php && php -l src/Revocation.php" }
+}
