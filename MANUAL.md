@@ -11,6 +11,9 @@ Veritas issues skill credentials that carry their own proof. Anyone can check on
 ## 3. Demo
 Tamper demo in the browser: serve `public/` and open it, then **Load sample → Verify** (passes) **→ Tamper one byte → Verify** (fails). Screenshot: `docs/screenshot.png`.
 
+![Real test run, captured 21 Nov 2026](docs/test-run.svg)
+*Real output from this repository's own tests, captured 21 Nov 2026.*
+
 ## 4. Run it yourself
 **Prerequisites:** PHP with ext-sodium. Composer for the full suite.
 
