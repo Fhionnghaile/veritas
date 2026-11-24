@@ -4,7 +4,7 @@
 > **Skill credentials that carry their own proof: verifiable offline, tamper-evident, scoped and revocable.**  
 > **Result:** 3 PHP suites + the same credential verified byte-for-byte by reference verifiers in Python, Kotlin and Swift against shared vectors.  
 > **Reproduce:** `composer install && composer test   # or: php tests/run.php`  
-> ![CI](https://github.com/fhionnghaile/veritas/actions/workflows/ci.yml/badge.svg)
+> ![CI](https://github.com/fhionnghaile/veritas/actions/workflows/ci.yml/badge.svg) [![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/Fhionnghaile/veritas/badge)](https://scorecard.dev/viewer/?uri=github.com/Fhionnghaile/veritas)
 >
 > **What this is worth:** An employer can trust a credential without phoning home — the basis of a portable, fraud-resistant skills record.
 
