@@ -2,7 +2,7 @@
 
 <!-- at-a-glance -->
 > **Skill credentials that carry their own proof: verifiable offline, tamper-evident, scoped and revocable.**  
-> **Result:** 3 PHP suites + the same credential verified byte-for-byte by reference verifiers in Python, Kotlin and Swift against shared vectors.  
+> **Result:** 3 PHPUnit tests (golden vectors, tamper at every byte, revocation and shares) + the same credential verified byte-for-byte by reference verifiers in Python, Kotlin and Swift against shared vectors.  
 > **Reproduce:** `composer install && composer test   # or: php tests/run.php`  
 > ![CI](https://github.com/fhionnghaile/veritas/actions/workflows/ci.yml/badge.svg) [![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/Fhionnghaile/veritas/badge)](https://scorecard.dev/viewer/?uri=github.com/Fhionnghaile/veritas)
 >
@@ -10,7 +10,7 @@
 
 
 Signed, offline-verifiable skill credentials (Ed25519). Issue a credential, verify it anywhere
-**without calling back to a database**, scope what a share link reveals, and revoke by id.
+**without calling back to a database**, choose which fields a share link displays, and revoke by id.
 
 ![verify demo](docs/screenshot.png)
 
@@ -35,12 +35,16 @@ Live tamper demo: open `public/index.html` → **Load sample** → **Verify** (�
 ## How it works
 - **Token** `v1.<base64url(payload)>.<base64url(sig)>`; signature covers `"v1."+payload` so canonicalisation can't drift across languages.
 - **Issuer** (`src/Issuer.php`) signs with an Ed25519 seed; **Verifier** (`src/Verifier.php`) checks signature, expiry and revocation offline.
-- **Share grants** (`makeShare`) disclose only chosen fields, expire on their own clock, and are revocable.
+- **Share grants** (`makeShare`) display only chosen fields, expire on their own clock, and are revocable. The scoping is enforced by the verifier, not cryptographically: the grant carries the whole credential (see THREAT-MODEL.md, I1, for the planned selective-disclosure fix).
 - The canonical format + cross-language golden vectors live in [`../credential/`](../credential/) — the same bytes the Laravel issuer and the iOS/Android apps test against.
 
 ## Tests
 `php tests/run.php` checks the golden vectors (valid / tampered / expired), a full issue→verify round-trip,
 revocation, and scoped share projection. CI runs on every push.
+
+## Threat model and decisions
+- [`THREAT-MODEL.md`](THREAT-MODEL.md): STRIDE with evidence, including four gaps found on review and their fixes.
+- [`docs/adr/`](docs/adr/): architecture decision records.
 
 ## License
 MIT.
