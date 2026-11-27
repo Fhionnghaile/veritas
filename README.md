@@ -2,7 +2,7 @@
 
 <!-- at-a-glance -->
 > **Skill credentials that carry their own proof: verifiable offline, tamper-evident, scoped and revocable.**  
-> **Result:** 3 PHPUnit tests (golden vectors, tamper at every byte, revocation and shares) + the same credential verified byte-for-byte by reference verifiers in Python, Kotlin and Swift against shared vectors.  
+> **Result:** 6 PHPUnit tests, all enforced in CI (golden vectors, tamper at every byte, revocation and shares, mandatory expiry and revocation id, endpoint honours revocation) + the same credential verified byte-for-byte by reference verifiers in Python, Kotlin and Swift against shared vectors.  
 > **Reproduce:** `composer install && composer test   # or: php tests/run.php`  
 > ![CI](https://github.com/fhionnghaile/veritas/actions/workflows/ci.yml/badge.svg) [![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/Fhionnghaile/veritas/badge)](https://scorecard.dev/viewer/?uri=github.com/Fhionnghaile/veritas)
 >
@@ -43,7 +43,7 @@ Live tamper demo: open `public/index.html` → **Load sample** → **Verify** (�
 revocation, and scoped share projection. CI runs on every push.
 
 ## Threat model and decisions
-- [`THREAT-MODEL.md`](THREAT-MODEL.md): STRIDE with evidence, including four gaps found on review and their fixes.
+- [`THREAT-MODEL.md`](THREAT-MODEL.md): STRIDE with evidence; four gaps found on review, two fixed (mandatory expiry and revocation id; revocation in the endpoint), two open with their fixes.
 - [`docs/adr/`](docs/adr/): architecture decision records.
 
 ## License

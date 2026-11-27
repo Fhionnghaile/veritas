@@ -26,6 +26,14 @@ final class Issuer
     /** Issue a credential token from claim fields (iss, kid, sub, skill, level, iat, exp, jti). */
     public function issue(array $claims): string
     {
+        // Threat model E2: a credential without exp would never expire, and one without jti could
+        // never be revoked. Both are mandatory.
+        if (!isset($claims['exp']) || !is_int($claims['exp'])) {
+            throw new \InvalidArgumentException('exp (integer unix seconds) is required');
+        }
+        if (!isset($claims['jti']) || !is_string($claims['jti']) || $claims['jti'] === '') {
+            throw new \InvalidArgumentException('jti (non-empty string) is required');
+        }
         $payloadB64 = Credential::b64urlEncode(Credential::canonical($claims));
         $sig = sodium_crypto_sign_detached(Credential::signingInput($payloadB64), $this->sk);
         return Credential::VERSION . '.' . $payloadB64 . '.' . Credential::b64urlEncode($sig);

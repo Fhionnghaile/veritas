@@ -33,7 +33,14 @@ final class Verifier
         } catch (\Throwable $e) {
             return ['valid' => false, 'reason' => 'malformed', 'payload' => null];
         }
-        if (isset($payload['exp']) && (int)$payload['exp'] < $now) {
+        // Threat model E2: refuse credentials that could never expire or never be revoked.
+        if (!is_array($payload) || !isset($payload['exp']) || !is_int($payload['exp'])) {
+            return ['valid' => false, 'reason' => 'missing exp', 'payload' => null];
+        }
+        if (!isset($payload['jti']) || !is_string($payload['jti']) || $payload['jti'] === '') {
+            return ['valid' => false, 'reason' => 'missing jti', 'payload' => null];
+        }
+        if ($payload['exp'] < $now) {
             return ['valid' => false, 'reason' => 'expired', 'payload' => $payload];
         }
         if ($this->rev && isset($payload['jti']) && $this->rev->isRevoked($payload['jti'])) {

@@ -1,0 +1,4 @@
+{
+  "note": "Published revocation list (sample). In production this file is signed by the issuer and refreshed by verifiers.",
+  "revoked": []
+}

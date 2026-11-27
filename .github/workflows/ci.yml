@@ -9,7 +9,7 @@ jobs:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
       - uses: shivammathur/setup-php@eb7c497e18156a6bbabfef1d3a82760b9eda3962 # v2
         with: { php-version: '8.2', extensions: sodium, tools: composer }
-      - run: php -l src/Credential.php && php -l src/Issuer.php && php -l src/Verifier.php && php -l src/Revocation.php
+      - run: php -l src/Credential.php && php -l src/Issuer.php && php -l src/Verifier.php && php -l src/Revocation.php && php -l src/Endpoint.php
       - run: php tests/run.php            # dependency-free golden-vector + round-trip check
-      - run: composer install --no-interaction --no-progress || true
-      - run: vendor/bin/phpunit || true   # full suite when composer deps are present
+      - run: composer install --no-interaction --no-progress
+      - run: vendor/bin/phpunit         # full suite; a failure fails CI

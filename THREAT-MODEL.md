@@ -1,7 +1,7 @@
 # Veritas: threat model
 
 Method: STRIDE, revised 2026-11-26 against the code as it stands (the first version, kept in git
-history, described some of the design rather than the code; the differences are marked **Gap** below).
+history, described some of the design rather than the code; the differences were marked **Gap**; two have since been fixed).
 Status: **Mitigated**, **Partial**, **Gap**, **Accepted**.
 
 **Asset:** a claim that a subject holds a skill at a level, trustworthy without a central lookup.
@@ -18,15 +18,15 @@ Status: **Mitigated**, **Partial**, **Gap**, **Accepted**.
 | R1 | Issuer denies having issued a credential | Only the issuer's key can produce a valid signature (non-repudiation for as long as the key is not compromised) | Mitigated |
 | I1 | A share link reveals more than the holder chose | The verifier displays only the chosen fields, **but the share token contains the whole credential**, which anyone holding the link can decode | **Gap**, fix F1 |
 | E1 | Keep using a credential after it should stop working | Expiry and revocation by `jti` are checked offline; the expiry/revocation logic is model-checked in veritas-tla and matches the PHP verifier on 47,898 of 47,898 decisions | Mitigated for credentials that carry `exp` and `jti` |
-| E2 | A credential issued without `exp` never expires; one without `jti` can never be revoked | `Issuer::issue` does not require either field | **Gap**, fix F2 |
-| E3 | The sample endpoint `public/verify.php` ignores revocation | It builds a `Verifier` with no revocation list | **Gap** (demo only), fix F3 |
+| E2 | A credential issued without `exp` never expires; one without `jti` can never be revoked | `exp` (integer) and `jti` (non-empty string) are mandatory: `Issuer::issue` refuses without them, and `Verifier::verify` rejects a validly signed token that lacks either (`testIssuerRequiresExpAndJti`, `testVerifierRejectsMissingExpOrJti`) | Mitigated (F2 done 27 Nov 2026) |
+| E3 | The sample endpoint `public/verify.php` ignores revocation | The endpoint now loads the published list (`samples/revoked.json`) through `Endpoint::verify` and fails closed if the list is missing or malformed (`testEndpointHonoursRevocationListAndFailsClosed`) | Mitigated (F3 done 27 Nov 2026) |
 | D1 | Verification depends on a server being up | None needed: verification is offline by design | Mitigated |
 | K1 | Issuer key compromise | `kid` is signed into each credential, so a key can be identified, but the verifier takes a single key; key-set lookup by `kid` and published key rotation are **designed, not built** | **Gap**, fix F4 |
 
 ## Fixes, in priority order
 - **F1 (I1):** real selective disclosure: sign salted hashes of each field (SD-JWT style) so a share carries only the disclosed fields plus their salts. Until then, the README describes share grants as display-scoped, not cryptographic.
-- **F2 (E2):** make `exp` and `jti` mandatory in `Issuer::issue`; reject credentials without them in `Verifier::verify`.
-- **F3 (E3):** wire the published revocation list into `public/verify.php`.
+- ~~**F2 (E2):** `exp` and `jti` mandatory.~~ Done 27 Nov 2026.
+- ~~**F3 (E3):** revocation in the endpoint.~~ Done 27 Nov 2026.
 - **F4 (K1):** verifier accepts a key set keyed by `kid` (from `/.well-known/veritas-keys.json`); rotation runbook.
 
 ## Out of scope
